@@ -5,6 +5,34 @@ import (
 	"time"
 )
 
+//db.collection.createIndex({ "location": "2dsphere" })
+
+/*
+db.collection.find({
+  "location": {
+    "$near": {
+      "$geometry": {
+        "type": "Point",
+        "coordinates": [-73.97, 40.77] // longitude, latitude order
+      },
+      "$maxDistance": 1000 // distance in meters
+    }
+  }
+})
+*/
+
+type Location struct {
+	Type        string    `bson:"type"`
+	Coordinates []float64 `bson:"coordinates"`
+}
+
+func NewLocation(coordinates []float64) *Location {
+	return &Location{
+		Type:        "Point",
+		Coordinates: coordinates,
+	}
+}
+
 type Advertisement struct {
 	ID                      primitive.ObjectID `bson:"_id"`
 	ActiveFlag              *bool              `bson:"ActiveFlag"`
@@ -42,4 +70,5 @@ type Advertisement struct {
 	YearlyPrice             *float32           `bson:"YearlyPrice,omitempty"`
 	ZipCode                 *string            `bson:"ZipCode,omitempty"`
 	Keywords                []string           `bson:"Keywords"`
+	Location                *Location          `bson:"location,omitempty"` // Replaces separate Latitude and Longitude fields
 }
