@@ -1,8 +1,8 @@
 package main
 
 import (
+	"advertisement-go/src/routes"
 	"log"
-	"udemy/src/routes"
 
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"

@@ -40,7 +40,7 @@ definitions:
         type: integer
       location:
         allOf:
-          - $ref: "#/definitions/domain.Location"
+        - $ref: '#/definitions/domain.Location'
         description: Replaces separate Latitude and Longitude fields
       longitude:
         type: number
@@ -59,8 +59,7 @@ definitions:
       periodPrice:
         type: number
       photos:
-        description:
-          Assuming Photos is an array of string. Adjust if the structure
+        description: Assuming Photos is an array of string. Adjust if the structure
           is different.
         items:
           type: string
@@ -111,58 +110,57 @@ definitions:
 info:
   contact: {}
 paths:
-  /search:
-    post:
-      consumes:
-        - application/json
-      description:
-        Searches for advertisements by longitude, latitude, and maximum
-        distance.
-      parameters:
-        - description: Geo Location Request
-          in: body
-          name: geoLocationRequest
-          required: true
-          schema:
-            $ref: "#/definitions/handlers.GeoLocationRequest"
-      produces:
-        - application/json
-      responses:
-        "200":
-          description: A list of advertisements within max distance
-          schema:
-            items:
-              $ref: "#/definitions/domain.Advertisement"
-            type: array
-      summary: Search by geo location with max distance
-      tags:
-        - advertisement
   /{longitude}/{latitude}:
     get:
       consumes:
-        - application/json
+      - application/json
       description: Searches for advertisements by longitude and latitude.
       parameters:
-        - description: Longitude
-          in: path
-          name: longitude
-          required: true
-          type: number
-        - description: Latitude
-          in: path
-          name: latitude
-          required: true
-          type: number
+      - description: Longitude
+        in: path
+        name: longitude
+        required: true
+        type: number
+      - description: Latitude
+        in: path
+        name: latitude
+        required: true
+        type: number
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: A list of advertisements
           schema:
             items:
-              $ref: "#/definitions/domain.Advertisement"
+              $ref: '#/definitions/domain.Advertisement'
             type: array
       summary: Search by geo location
       tags:
-        - advertisement
+      - advertisement
+  /search:
+    post:
+      consumes:
+      - application/json
+      description: Searches for advertisements by longitude, latitude, and maximum
+        distance.
+      parameters:
+      - description: Geo Location Request
+        in: body
+        name: geoLocationRequest
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.GeoLocationRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: A list of advertisements within max distance
+          schema:
+            items:
+              $ref: '#/definitions/domain.Advertisement'
+            type: array
+      summary: Search by geo location with max distance
+      tags:
+      - advertisement
 swagger: "2.0"

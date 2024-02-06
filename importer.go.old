@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"log"
 	"time"
-	"udemy/src/domain"
-	"udemy/src/repository"
+	"advertisement-go/src/domain"
+	"advertisement-go/src/repository"
 
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"

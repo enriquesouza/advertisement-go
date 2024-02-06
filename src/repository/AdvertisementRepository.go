@@ -1,8 +1,8 @@
 package repository
 
 import (
-	"udemy/src/database"
-	"udemy/src/domain"
+	"advertisement-go/src/database"
+	"advertisement-go/src/domain"
 
 	"go.mongodb.org/mongo-driver/bson"
 )

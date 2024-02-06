@@ -1,11 +1,12 @@
 package handlers
 
 import (
-	"github.com/labstack/echo/v4"
+	_ "advertisement-go/src/domain"
+	"advertisement-go/src/repository"
 	"net/http"
 	"strconv"
-	_ "udemy/src/domain"
-	"udemy/src/repository"
+
+	"github.com/labstack/echo/v4"
 )
 
 type GeoLocationRequest struct {

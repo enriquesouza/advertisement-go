@@ -1,4 +1,4 @@
-module udemy
+module advertisement-go
 
 go 1.21.6
 
