@@ -15,6 +15,7 @@ func InitRoutes(e *echo.Echo) {
 		return c.JSONPretty(http.StatusCreated, advertisement.List(), "  ")
 	})
 
+	//http://localhost:1323/-46.6773326/-23.5800755
 	e.GET("/:longitude/:latitude", func(c echo.Context) error {
 		longitudeStr := c.Param("longitude")
 		latitudeStr := c.Param("latitude")
