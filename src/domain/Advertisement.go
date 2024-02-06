@@ -1,8 +1,10 @@
 package domain
 
 import (
-	"go.mongodb.org/mongo-driver/bson/primitive"
+	"fmt"
 	"time"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 //db.collection.createIndex({ "location": "2dsphere" })
@@ -23,13 +25,17 @@ db.collection.find({
 
 type Location struct {
 	Type        string    `bson:"type"`
-	Coordinates []float64 `bson:"coordinates"`
+	Coordinates []float64 `bson:"coordinates"` // longitude, latitude order
+}
+
+func (l Location) String() string {
+	return fmt.Sprintf("%v", l.Coordinates)
 }
 
 func NewLocation(coordinates []float64) *Location {
 	return &Location{
 		Type:        "Point",
-		Coordinates: coordinates,
+		Coordinates: coordinates, // longitude, latitude order
 	}
 }
 

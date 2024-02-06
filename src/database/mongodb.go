@@ -3,6 +3,7 @@ package database
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"os"
 	"time"
@@ -14,7 +15,7 @@ import (
 
 var (
 	client         *mongo.Client
-	defaultTimeout = 10 * time.Second // Default timeout for database operations
+	defaultTimeout = 60 * 5 * time.Second // Default timeout for database operations 5 min
 )
 
 func Init() {
@@ -58,4 +59,20 @@ func Find[T any](collectionName string, condition bson.D) []T {
 	}
 
 	return items
+}
+
+func InsertMany[T any](collectionName string, newItems []T) {
+	ctx, cancel := context.WithTimeout(context.Background(), defaultTimeout)
+	defer cancel()
+
+	collection := GetMongoCollection(collectionName)
+	interfaceSlice := make([]interface{}, len(newItems))
+	for i, item := range newItems {
+		interfaceSlice[i] = item
+	}
+	_, err := collection.InsertMany(ctx, interfaceSlice)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("All items inserted on Mongo successfuly")
 }

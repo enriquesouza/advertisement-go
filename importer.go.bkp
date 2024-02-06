@@ -1,0 +1,187 @@
+package main
+
+import (
+	"database/sql"
+	"fmt"
+	"log"
+	"time"
+	"udemy/src/domain"
+	"udemy/src/repository"
+
+	"github.com/joho/godotenv"
+	_ "github.com/lib/pq"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+)
+
+const (
+	host     = "localhost"
+	port     = 5432 // Default PostgreSQL port
+	user     = "postgres"
+	password = "postgres"
+	dbname   = "alugue1"
+)
+
+func init() {
+	// Load the .env file
+	err := godotenv.Load() // Tries to load from the current directory
+	if err != nil {
+		log.Fatalf("Error loading .env file: %v", err)
+	}
+}
+
+func main() {
+	// PostgreSQL connection string
+	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
+		host, port, user, password, dbname)
+
+	var ads = []domain.Advertisement{}
+
+	// Open the connection
+	db, err := sql.Open("postgres", psqlInfo)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	// Verify connection
+	err = db.Ping()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println("Successfully connected!")
+
+	// Define your SQL query here
+	query := `SELECT id, anuncianteid, dataanuncio, titulo, cep, logradouro, numero, complemento, cidade, estado, municipio, bairro, tipoanuncio, periodo, anunciovalidode, anunciovalidoate, precodia, precosemana, precomes, precoano, flagativa, descricao, tamanho, datadisponibilidade, precohora, latitude, longitude, precoperiodo FROM anuncio`
+
+	// Execute the query
+	rows, err := db.Query(query)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var (
+			id                  int
+			anuncianteid        int
+			dataanuncio         time.Time
+			titulo              string
+			cep                 sql.NullString
+			logradouro          sql.NullString
+			numero              sql.NullInt64
+			complemento         sql.NullString
+			cidade              string
+			estado              string
+			municipio           string
+			bairro              sql.NullString
+			tipoanuncio         int
+			periodo             string
+			anunciovalidode     time.Time
+			anunciovalidoate    time.Time
+			precodia            sql.NullFloat64
+			precosemana         sql.NullFloat64
+			precomes            sql.NullFloat64
+			precoano            sql.NullFloat64
+			flagativa           int
+			descricao           sql.NullString
+			tamanho             sql.NullInt64
+			datadisponibilidade sql.NullTime
+			precohora           sql.NullFloat64
+			latitude            sql.NullFloat64
+			longitude           sql.NullFloat64
+			precoperiodo        sql.NullFloat64
+		)
+
+		err := rows.Scan(&id, &anuncianteid, &dataanuncio, &titulo, &cep, &logradouro, &numero, &complemento, &cidade, &estado, &municipio, &bairro, &tipoanuncio, &periodo, &anunciovalidode, &anunciovalidoate, &precodia, &precosemana, &precomes, &precoano, &flagativa, &descricao, &tamanho, &datadisponibilidade, &precohora, &latitude, &longitude, &precoperiodo)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		// Convert to your domain.Advertisement struct
+		ad := domain.Advertisement{
+			ID:                primitive.NewObjectID(),
+			ActiveFlag:        convertIntToBoolPtr(flagativa),
+			AdditionalInfo:    convertNullStringToStringPtr(descricao),
+			AdvertisementDate: &dataanuncio,
+			AdvertisementType: convertIntToStringPtr(tipoanuncio),
+			AvailabilityDate:  convertNullTimeToTimePtr(datadisponibilidade),
+			AdvertiserId:      convertIntToInt64Ptr(anuncianteid),
+			City:              &cidade,
+			DailyPrice:        convertNullFloatToFloat32Ptr(precodia),
+			Description:       descricao.String,
+			HourlyPrice:       convertNullFloatToFloat32Ptr(precohora),
+			Latitude:          convertNullFloatToFloat64Ptr(latitude),
+			Longitude:         convertNullFloatToFloat64Ptr(longitude),
+			MonthlyPrice:      convertNullFloatToFloat32Ptr(precomes),
+			Municipality:      &municipio,
+			Neighborhood:      convertNullStringToStringPtr(bairro),
+			Number:            convertNullInt64ToStringPtr(numero),
+			Period:            &periodo,
+			PeriodPrice:       convertNullFloatToFloat32Ptr(precoperiodo),
+			Location:          domain.NewLocation([]float64{*convertNullFloatToFloat64Ptr(longitude), *convertNullFloatToFloat64Ptr(latitude)}),
+			// Add other fields as necessary
+			// longitude, latitude order
+		}
+
+		ads = append(ads, ad)
+
+		fmt.Printf("%+v\n", ad)
+	}
+
+	advertisementRepository := repository.AdvertisementRepository{}
+	advertisementRepository.Insert(ads)
+}
+
+// Helper functions to convert SQL Null types to pointers for the Go struct fields
+func convertIntToBoolPtr(i int) *bool {
+	b := i != 0
+	return &b
+}
+
+func convertNullStringToStringPtr(ns sql.NullString) *string {
+	if ns.Valid {
+		return &ns.String
+	}
+	return nil
+}
+
+func convertNullTimeToTimePtr(nt sql.NullTime) *time.Time {
+	if nt.Valid {
+		return &nt.Time
+	}
+	return nil
+}
+
+func convertIntToInt64Ptr(i int) *int64 {
+	i64 := int64(i)
+	return &i64
+}
+
+func convertNullFloatToFloat32Ptr(nf sql.NullFloat64) *float32 {
+	if nf.Valid {
+		f32 := float32(nf.Float64)
+		return &f32
+	}
+	return nil
+}
+
+func convertNullInt64ToStringPtr(ni sql.NullInt64) *string {
+	if ni.Valid {
+		s := fmt.Sprintf("%d", ni.Int64)
+		return &s
+	}
+	return nil
+}
+
+func convertNullFloatToFloat64Ptr(nf sql.NullFloat64) *float64 {
+	if nf.Valid {
+		return &nf.Float64
+	}
+	return nil
+}
+
+func convertIntToStringPtr(i int) *string {
+	s := fmt.Sprintf("%d", i)
+	return &s
+}

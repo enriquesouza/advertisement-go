@@ -23,3 +23,10 @@ func (a AdvertisementRepository) List() []domain.Advertisement {
 
 	return users
 }
+
+func (a AdvertisementRepository) Insert(items []domain.Advertisement) {
+	database.Init()
+	defer database.Disconnect()
+
+	database.InsertMany[domain.Advertisement]("anuncio", items)
+}
