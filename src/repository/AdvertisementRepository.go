@@ -42,3 +42,26 @@ func (a AdvertisementRepository) ListByGeoLocation(longitude, latitude float64) 
 
 	return ads
 }
+
+func (a AdvertisementRepository) ListByGeoLocationWithMaxDistance(longitude, latitude float64, maxDistance int32) []domain.Advertisement {
+	database.Init()
+	defer database.Disconnect()
+
+	if maxDistance == 0 {
+		maxDistance = 1000
+	}
+
+	ads := database.Find[domain.Advertisement]("anuncio", bson.D{
+		{"location", bson.D{
+			{"$near", bson.D{
+				{"$geometry", bson.D{
+					{"type", "Point"},
+					{"coordinates", bson.A{longitude, latitude}},
+				}},
+				{"$maxDistance", maxDistance},
+			}},
+		}},
+	})
+
+	return ads
+}

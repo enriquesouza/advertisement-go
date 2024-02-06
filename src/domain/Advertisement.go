@@ -22,7 +22,7 @@ db.collection.find({
   }
 })
 */
-
+// Location represents a geographical point with a specific type and coordinates.
 type Location struct {
 	Type        string    `bson:"type"`
 	Coordinates []float64 `bson:"coordinates"` // longitude, latitude order
@@ -39,6 +39,8 @@ func NewLocation(coordinates []float64) *Location {
 	}
 }
 
+// Advertisement represents the structure of an advertisement with various properties.
+// @Description Advertisement structure with detailed advertisement information.
 type Advertisement struct {
 	ID                      primitive.ObjectID `bson:"_id"`
 	ActiveFlag              *bool              `bson:"ActiveFlag"`
