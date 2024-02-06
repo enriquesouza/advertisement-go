@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"fmt"
 	"udemy/src/database"
 	"udemy/src/domain"
 
@@ -14,14 +13,9 @@ type AdvertisementRepository struct {
 func (a AdvertisementRepository) List() []domain.Advertisement {
 	database.Init()
 	defer database.Disconnect()
-	users := database.Find[domain.Advertisement]("anuncio", bson.D{})
+	ads := database.Find[domain.Advertisement]("anuncio", bson.D{})
 
-	for i := 0; i < len(users); i++ {
-		user := users[i]
-		fmt.Println(user)
-	}
-
-	return users
+	return ads
 }
 
 func (a AdvertisementRepository) Insert(items []domain.Advertisement) {
@@ -34,7 +28,7 @@ func (a AdvertisementRepository) Insert(items []domain.Advertisement) {
 func (a AdvertisementRepository) ListByGeoLocation(longitude, latitude float64) []domain.Advertisement {
 	database.Init()
 	defer database.Disconnect()
-	users := database.Find[domain.Advertisement]("anuncio", bson.D{
+	ads := database.Find[domain.Advertisement]("anuncio", bson.D{
 		{"location", bson.D{
 			{"$near", bson.D{
 				{"$geometry", bson.D{
@@ -46,10 +40,5 @@ func (a AdvertisementRepository) ListByGeoLocation(longitude, latitude float64) 
 		}},
 	})
 
-	for i := 0; i < len(users); i++ {
-		user := users[i]
-		fmt.Println(user)
-	}
-
-	return users
+	return ads
 }
