@@ -98,13 +98,13 @@ func main() {
 			log.Fatal(err)
 		}
 
-		// Convert to your domain.Advertisement struct
+		// Inside your loop after scanning values from the database
 		ad := domain.Advertisement{
 			ID:                primitive.NewObjectID(),
 			ActiveFlag:        convertIntToBoolPtr(flagativa),
 			AdditionalInfo:    convertNullStringToStringPtr(descricao),
 			AdvertisementDate: &dataanuncio,
-			AdvertisementType: convertIntToStringPtr(tipoanuncio),
+			AdvertisementType: convertSmallIntToStringPtr(tipoanuncio), // Assuming a function to map smallint to string
 			AvailabilityDate:  convertNullTimeToTimePtr(datadisponibilidade),
 			AdvertiserId:      convertIntToInt64Ptr(anuncianteid),
 			City:              &cidade,
@@ -119,9 +119,14 @@ func main() {
 			Number:            convertNullInt64ToStringPtr(numero),
 			Period:            &periodo,
 			PeriodPrice:       convertNullFloatToFloat32Ptr(precoperiodo),
+			Street:            convertNullStringToStringPtr(logradouro),
+			State:             &estado,
+			Title:             titulo,
+			ZipCode:           convertNullStringToStringPtr(cep),
+			Size:              convertNullInt64ToStringPtr(tamanho), // Assuming you want to store size as a string; adjust if it should be an int
 			Location:          domain.NewLocation([]float64{*convertNullFloatToFloat64Ptr(longitude), *convertNullFloatToFloat64Ptr(latitude)}),
-			// Add other fields as necessary
-			// longitude, latitude order
+			// Add other conversion for fields that require mapping or conversion
+			// Ensure all pointer fields are properly handled to avoid nil pointer dereference
 		}
 
 		ads = append(ads, ad)
@@ -184,4 +189,18 @@ func convertNullFloatToFloat64Ptr(nf sql.NullFloat64) *float64 {
 func convertIntToStringPtr(i int) *string {
 	s := fmt.Sprintf("%d", i)
 	return &s
+}
+
+func convertSmallIntToStringPtr(value int) *string {
+	var str string
+	switch value {
+	case 1:
+		str = "Type1" // Replace "Type1" with the actual meaning of this value
+	case 2:
+		str = "Type2" // And so on for each type of advertisement
+	// Add more cases as needed
+	default:
+		str = "Unknown"
+	}
+	return &str
 }

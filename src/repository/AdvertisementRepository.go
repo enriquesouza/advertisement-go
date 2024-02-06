@@ -30,3 +30,26 @@ func (a AdvertisementRepository) Insert(items []domain.Advertisement) {
 
 	database.InsertMany[domain.Advertisement]("anuncio", items)
 }
+
+func (a AdvertisementRepository) ListByGeoLocation(longitude, latitude float64) []domain.Advertisement {
+	database.Init()
+	defer database.Disconnect()
+	users := database.Find[domain.Advertisement]("anuncio", bson.D{
+		{"location", bson.D{
+			{"$near", bson.D{
+				{"$geometry", bson.D{
+					{"type", "Point"},
+					{"coordinates", bson.A{longitude, latitude}},
+				}},
+				{"$maxDistance", 1000},
+			}},
+		}},
+	})
+
+	for i := 0; i < len(users); i++ {
+		user := users[i]
+		fmt.Println(user)
+	}
+
+	return users
+}
